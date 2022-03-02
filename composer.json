@@ -1,0 +1,16 @@
+{
+    "name": "cmbibby/localadvantage-app-sync",
+    "type": "wordpress-plugin",
+    "authors": [
+        {
+            "name": "Chris Bibby",
+            "email": "cmbibby@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+      "psr-4": {
+        "LA_App_Sync\\" : "inc/"
+      }
+    }
+}
