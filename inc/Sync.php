@@ -16,6 +16,7 @@ Class Sync{
 		// echo '<pre>' . var_export( $response['offers'], true ) . '</pre>';
 		$offer_count = 0;
 		foreach($response['offers'] as $offer){
+			if(1 == $offer['active'] && 1 == $offer['region_id']){
 				$offer_count ++;
 				echo $offer['active'] . '<br />';
 				echo $offer['vendor_name'] . '<br />';
@@ -27,6 +28,8 @@ Class Sync{
 				echo $offer['phone'] . '<br />';
 				echo $offer['website'] . '<br />';
 				echo '<hr />';
+			}
+
 		}
 		echo $offer_count;
 
