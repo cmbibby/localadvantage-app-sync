@@ -56,7 +56,7 @@ class Sync
 					update_field($key, $offer[$name], $offer_id);
 				}
 
-				$media_id = media_sideload_image('https://app.localadvantage.com.au/images/catalog/' . $offer['images'][0], null, null, 'id');
+				$media_id = media_sideload_image('https://app.localadvantage.com.au/images/catalog/' . $offer['images'][0], null, $offer['vendor_name'], 'id');
 
 				set_post_thumbnail($offer_id, $media_id);
 				// $images = $offer['images'];
