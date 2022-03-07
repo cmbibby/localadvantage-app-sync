@@ -79,13 +79,35 @@ class Sync
 				// Update the Map
 
 				$map_values = array(
-					'address' => $offers['address'],
 					'lat' => $offers['latitude'],
-					'lng' => $offers['longitude'],
+					'lng' => $offers['longitude']
 				);
 
 				update_field('field_59a55ca565562', $map_values, $offer_id);
 
+				// Locations
+
+				$existing_term = term_exists($offer['location_name']);
+
+				if($existing_term){
+					wp_set_post_terms($offer_id, $existing_term, 'sw_location', false);
+				}else{
+					$new_location = wp_insert_term($offer['location_name'], 'sw_location');
+					wp_set_post_terms($offer_id, $new_location,false);
+				}
+
+				// Categories are in an array so let's grab them
+
+				$categories = $offer['categories'];
+				foreach($categories as $category){
+					$existing_category = term_exists($offer_id, $category['name']);
+					if($existing_category){
+						wp_set_post_terms($offer_id, $existing_category, 'sw_category', true);
+					}else{
+						$new_category = wp_insert_term($category['name'], 'sw_category');
+						wp_set_post_terms($offer_id, $new_category, true);
+					}
+				}
 				echo $offer_id . '<br />';
 			}
 		}
