@@ -56,13 +56,35 @@ class Sync
 					update_field($key, $offer[$name], $offer_id);
 				}
 
-				$media_id = media_sideload_image('https://app.localadvantage.com.au/images/catalog/' . $offer['images'][0], null, $offer['vendor_name'], 'id');
+				// Do the Logo
+
+				$images = $offer['images'];
+
+				$logo = array_shift($images);
+
+				$media_id = media_sideload_image('https://app.localadvantage.com.au/images/catalog/' . $logo, null, $offer['vendor_name'], 'id');
 
 				set_post_thumbnail($offer_id, $media_id);
-				// $images = $offer['images'];
-				// foreach($images as $image){
-				// 	echo sprintf('<img src="https://app.localadvantage.com.au/images/catalog/%1$s" />',$images);
-				// }
+
+				// Do the Gallery images
+
+				$gallery_media = array();
+				foreach($images as $image){
+					$image_name = Utilities::format_image_title($offer['vendor_name'], $image);
+					$gallery_media[] = media_sideload_image('https://app.localadvantage.com.au/images/catalog/'. $image, null, $image_name, 'id');
+				}
+
+				update_field('field_59a74fe116594', $gallery_media, $offer_id);
+
+				// Update the Map
+
+				$map_values = array(
+					'address' => $offers['address'],
+					'lat' => $offers['latitude'],
+					'lng' => $offers['longitude'],
+				);
+
+				update_field('field_59a55ca565562', $map_values, $offer_id);
 
 				echo $offer_id . '<br />';
 			}
