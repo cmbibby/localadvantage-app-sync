@@ -48,6 +48,26 @@ class Sync
 					$location_term = wp_insert_term($offer['location_name'], 'sw_location');
 				}
 
+				// Categories
+
+
+
+				$categories = $offer['categories'];
+
+				$categories_to_add = [];
+				foreach($categories as $category){
+					$existing_category = term_exists($offer_id, $category['name'],'sw_category');
+					if($existing_category){
+						$categories_to_add[] = $existing_category['term_taxonomy_id'];
+					}else{
+						$new_category = wp_insert_term($category['name'], 'sw_category');
+						echo '<pre>' . var_export( $new_category, true ) . '</pre>';
+						$categories_to_add[] = $new_category['term_taxonomy_id'];
+					}
+				}
+				echo '<pre>' . var_export( $categories_to_add, true ) . '</pre>';
+				// Lets insert the post
+
 				$offer_id = wp_insert_post(array(
 					'post_name' => sanitize_title($offer['vendor_name']),
 					'post_title' => $offer['vendor_name'],
@@ -94,22 +114,6 @@ class Sync
 				update_field('field_59a74fe116594', $gallery_media, $offer_id);
 
 
-				// Categories are in an array so let's grab them
-
-				// $categories = $offer['categories'];
-
-				// $categories_to_add = [];
-				// foreach($categories as $category){
-				// 	$existing_category = term_exists($offer_id, $category['name']);
-				// 	if($existing_category){
-				// 		$categories_to_add[] = $existing_category;
-				// 	}else{
-				// 		$new_category = wp_insert_term($category['name'], 'sw_location');
-				// 		$categories_to_add[] = $new_category;
-				// 	}
-				// }
-
-				// echo '<pre>' . var_export( $categories_to_add, true ) . '</pre>';
 
 			}
 		}
