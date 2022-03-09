@@ -21,9 +21,12 @@ class Sync
 		echo 'Off to get some Offers <br /><br /><hr />';
 		$response = wp_remote_retrieve_body(wp_remote_get('https://app.localadvantage.com.au/api/v2/offers'));
 		$response = json_decode($response, true);
-		// echo '<pre>' . var_export( $response['offers'], true ) . '</pre>';
 		$offer_count = 0;
 		foreach ($response['offers'] as $offer) {
+			if($offer_count > 10){
+				return;
+			}
+
 			if (1 == $offer['active'] && 1 == $offer['region_id']) {
 				$offer_count++;
 				// echo $offer['active'] . '<br />';
@@ -36,11 +39,23 @@ class Sync
 				// echo $offer['phone'] . '<br />';
 				// echo $offer['website'] . '<br />';
 				// echo '<hr />';
+
+				// Locations
+
+				$location_term = term_exists($offer['location_name'], 'sw_location');
+
+				if(! $location_term){
+					$location_term = wp_insert_term($offer['location_name'], 'sw_location');
+				}
+
 				$offer_id = wp_insert_post(array(
 					'post_name' => sanitize_title($offer['vendor_name']),
 					'post_title' => $offer['vendor_name'],
 					'post_type' => 'sw_offers',
-					'post_status' => 'publish'
+					'post_status' => 'publish',
+					'tax_input' => array(
+						'sw_location' => $location_term
+					)
 				));
 
 				$acf_fields = array(
@@ -51,6 +66,8 @@ class Sync
 					'field_59a55deb8384e' => 'address',
 					'field_59a67fa63fbb0' => 'phone',
 					'field_59a55e0b11ceb' => 'website',
+					'field_6228978384673' => 'latitude',
+					'field_6228978abb5b6' => 'longitude'
 				);
 				foreach ($acf_fields as $key => $name) {
 					update_field($key, $offer[$name], $offer_id);
@@ -76,39 +93,24 @@ class Sync
 
 				update_field('field_59a74fe116594', $gallery_media, $offer_id);
 
-				// Update the Map
-
-				$map_values = array(
-					'lat' => $offers['latitude'],
-					'lng' => $offers['longitude']
-				);
-
-				update_field('field_59a55ca565562', $map_values, $offer_id);
-
-				// Locations
-
-				$existing_term = term_exists($offer['location_name']);
-
-				if($existing_term){
-					wp_set_post_terms($offer_id, $existing_term, 'sw_location', false);
-				}else{
-					$new_location = wp_insert_term($offer['location_name'], 'sw_location');
-					wp_set_post_terms($offer_id, $new_location,false);
-				}
 
 				// Categories are in an array so let's grab them
 
-				$categories = $offer['categories'];
-				foreach($categories as $category){
-					$existing_category = term_exists($offer_id, $category['name']);
-					if($existing_category){
-						wp_set_post_terms($offer_id, $existing_category, 'sw_category', true);
-					}else{
-						$new_category = wp_insert_term($category['name'], 'sw_category');
-						wp_set_post_terms($offer_id, $new_category, true);
-					}
-				}
-				echo $offer_id . '<br />';
+				// $categories = $offer['categories'];
+
+				// $categories_to_add = [];
+				// foreach($categories as $category){
+				// 	$existing_category = term_exists($offer_id, $category['name']);
+				// 	if($existing_category){
+				// 		$categories_to_add[] = $existing_category;
+				// 	}else{
+				// 		$new_category = wp_insert_term($category['name'], 'sw_location');
+				// 		$categories_to_add[] = $new_category;
+				// 	}
+				// }
+
+				// echo '<pre>' . var_export( $categories_to_add, true ) . '</pre>';
+
 			}
 		}
 		echo $offer_count;
