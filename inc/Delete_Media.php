@@ -13,6 +13,9 @@ class Delete_Media
 
 	public function delete_post_attachments($post_id, $post)
 	{
+
+		/** TODO: Handle GS offers post type */
+
 		if($post->post_type !== 'sw_offers'){
 			return;
 		}
