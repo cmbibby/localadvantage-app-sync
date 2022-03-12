@@ -9,13 +9,17 @@ class Sync
 		add_action('wp_ajax_nopriv_get_offers_from_api', array($this, 'get_offers'));
 		add_action('wp_ajax_get_offers_from_api', array($this, 'get_offers'));
 		add_action('get_offers', array($this, 'get_offers'));
+
+		// We need to bring these in to use media_sideload
+
+		require_once(ABSPATH . 'wp-admin/includes/media.php');
+		require_once(ABSPATH . 'wp-admin/includes/file.php');
+		require_once(ABSPATH . 'wp-admin/includes/image.php');
 	}
 
 	public function get_offers()
 	{
-		require_once(ABSPATH . 'wp-admin/includes/media.php');
-		require_once(ABSPATH . 'wp-admin/includes/file.php');
-		require_once(ABSPATH . 'wp-admin/includes/image.php');
+
 
 		$offers = array();
 		echo 'Off to get some Offers <br /><br /><hr />';
@@ -29,16 +33,6 @@ class Sync
 
 			if (1 == $offer['active'] && 1 == $offer['region_id']) {
 				$offer_count++;
-				// echo $offer['active'] . '<br />';
-				// echo $offer['vendor_name'] . '<br />';
-				// echo $offer['offer_title'] . '<br />';
-				// echo $offer['offer_description'] . '<br />';
-				// echo $offer['offer_conditions'] . '<br />';
-				// echo $offer['vendor_about'] . '<br />';
-				// echo $offer['address'] . '<br />';
-				// echo $offer['phone'] . '<br />';
-				// echo $offer['website'] . '<br />';
-				// echo '<hr />';
 
 				// Locations
 
@@ -56,16 +50,25 @@ class Sync
 
 				$categories_to_add = [];
 				foreach($categories as $category){
-					$existing_category = term_exists($offer_id, $category['name'],'sw_category');
+					$existing_category = term_exists($category['name'],'sw_category');
 					if($existing_category){
 						$categories_to_add[] = $existing_category['term_taxonomy_id'];
 					}else{
 						$new_category = wp_insert_term($category['name'], 'sw_category');
-						echo '<pre>' . var_export( $new_category, true ) . '</pre>';
 						$categories_to_add[] = $new_category['term_taxonomy_id'];
 					}
 				}
-				echo '<pre>' . var_export( $categories_to_add, true ) . '</pre>';
+
+				// Check if the post exists and if so delete it
+
+				$existing_post_id = post_exists($offer['vendor_name'],'','','sw_offers','publish');
+
+				echo '<pre>' . var_export( $existing_post_id, true ) . '</pre>';
+
+				if($existing_post_id > 0){
+					wp_delete_post($existing_post_id);
+				}
+
 				// Lets insert the post
 
 				$offer_id = wp_insert_post(array(
@@ -74,7 +77,8 @@ class Sync
 					'post_type' => 'sw_offers',
 					'post_status' => 'publish',
 					'tax_input' => array(
-						'sw_location' => $location_term
+						'sw_location' => $location_term,
+						'sw_category' => $categories_to_add
 					)
 				));
 
