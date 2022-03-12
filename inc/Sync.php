@@ -19,16 +19,16 @@ class Sync
 
 	public function get_offers()
 	{
-
+		Utilities::update_timestamp();
 
 		$offers = array();
 		$response = wp_remote_retrieve_body(wp_remote_get('https://app.localadvantage.com.au/api/v2/offers'));
 		$response = json_decode($response, true);
 		$offer_count = 0;
 		foreach ($response['offers'] as $offer) {
-			// if($offer_count > 10){
-			// 	return;
-			// }
+			if($offer_count > 10){
+				return;
+			}
 
 			switch ($offer['region_id']) {
 				case 1:
