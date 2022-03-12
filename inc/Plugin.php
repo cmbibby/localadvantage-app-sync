@@ -5,6 +5,7 @@ Class Plugin{
 	const GW_REGION_ID = 2;
 	public function __construct()
 	{
+		new Delete_Media;
 	    new Options_Page;
 		new Sync;
 	}

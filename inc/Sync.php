@@ -72,7 +72,7 @@ class Sync
 			$existing_post_id = post_exists($offer['vendor_name'], '', '', $post_type, 'publish');
 
 			if ($existing_post_id > 0) {
-				wp_delete_post($existing_post_id);
+				wp_delete_post($existing_post_id, true);
 			}
 
 			// Check the active field and bail if it isn't there
