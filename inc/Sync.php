@@ -20,16 +20,21 @@ class Sync
 	public function get_offers()
 	{
 		Utilities::update_timestamp();
-
 		$offers = array();
 		$response = wp_remote_retrieve_body(wp_remote_get('https://app.localadvantage.com.au/api/v2/offers'));
 		$response = json_decode($response, true);
 		$offer_count = 0;
 		foreach ($response['offers'] as $offer) {
-			if($offer_count > 10){
+			if ($offer_count > 5) {
+				$last_updated = get_field('last_update_time', 'option');
+				wp_send_json_success(array(
+					'offer_count' => $offer_count,
+					'last_updated_at' => $last_updated
+				), 200);
+
+				wp_die();
 				return;
 			}
-
 			switch ($offer['region_id']) {
 				case 1:
 					$post_type = 'sw_offers';
@@ -131,6 +136,12 @@ class Sync
 
 			update_field('field_59a74fe116594', $gallery_media, $offer_id);
 		}
-		echo $offer_count;
+		$last_updated = get_field('last_update_time', 'option');
+		wp_send_json_success(array(
+			'offer_count' => $offer_count,
+			'last_updated_at' => $last_updated
+		), 200);
+
+		wp_die();
 	}
 }

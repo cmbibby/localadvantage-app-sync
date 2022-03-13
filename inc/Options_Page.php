@@ -22,7 +22,12 @@ class Options_Page
 	{
 ?>
 		<h1>App Sync</h1>
-		<p>Last Update Time : <?php echo get_field('last_update_time','option'); ?></p>
+		<h2 >Last Update Time : <span id="updateTime"><?php echo get_field('last_update_time','option'); ?></span></h2>
+		<p id="infoContainer"></p>
+		<button id="import_all" class="button-primary">Import All Offers</button>
+		<div id="spinner" class="spinner" style="float:none;width:auto;height:auto;padding:10px 0 10px 50px;background-position:20px 0;">
+
+
 
 <?php
 	}

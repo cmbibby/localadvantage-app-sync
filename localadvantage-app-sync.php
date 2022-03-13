@@ -18,5 +18,5 @@ namespace LA_App_Sync;
 require( __DIR__ ) . '/vendor/autoload.php';
 
 add_action('plugins_loaded', function(){
-	new Plugin;
+	new Plugin(plugin_dir_url(__FILE__));
 });
