@@ -6,7 +6,7 @@ document.addEventListener("click", (event) => {
 	infoContainer.textContent = "Fetching Offers from API...";
 	spinner.classList.add("is-active");
 	wp.ajax
-		.post("get_offers_from_api", {})
+		.post("get_offers_all", {})
 		.done((response) => {
 			infoContainer.textContent =
 				"Successfully imported " + response.offer_count + " offers.";
