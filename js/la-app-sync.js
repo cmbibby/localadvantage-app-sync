@@ -2,8 +2,8 @@ document.addEventListener("click", (event) => {
 	if (!event.target.matches("#import_all")) return;
 	var infoContainer = document.getElementById("infoContainer");
 	var updateTime = document.getElementById("updateTime");
-	var spinner = document.getElementById("spinner");
-	infoContainer.textContent = "Grabbing Stuff from API";
+	var spinner = document.getElementById("allOffersSpinner");
+	infoContainer.textContent = "Fetching Offers from API...";
 	spinner.classList.add("is-active");
 	wp.ajax
 		.post("get_offers_from_api", {})
