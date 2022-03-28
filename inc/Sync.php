@@ -3,12 +3,14 @@
 namespace LA_App_Sync;
 
 class Sync {
+
+
 	public function __construct() {
 		 add_action( 'wp_ajax_nopriv_get_offers_all', array( $this, 'get_offers_all' ) );
 		add_action( 'wp_ajax_get_offers_all', array( $this, 'get_offers_all' ) );
 		add_action( 'wp_ajax_nopriv_get_offers_latest', array( $this, 'get_offers_latest' ) );
 		add_action( 'wp_ajax_get_offers_latest', array( $this, 'get_offers_latest' ) );
-	// add_action( 'get_offers', array( $this, 'get_offers' ) );
+		add_action( 'get_offers', array( $this, 'get_offers_all' ) );
 
 		// We need to bring these in to use media_sideload
 
@@ -18,11 +20,11 @@ class Sync {
 	}
 
 	public function get_offers_all() {
-		$this->get_offers( true );
+	  $this->get_offers( true );
 	}
 
 	public function get_offers_latest() {
-		$this->get_offers( false );
+	   $this->get_offers( false );
 	}
 
 	public function get_offers( $all ) {
@@ -31,7 +33,7 @@ class Sync {
 
 		if ( false == $all ) {
 			// build the url with updated since timestamp
-			$api_url = '';
+			// /	$api_url = '';
 		}
 
 		Utilities::update_timestamp();
@@ -40,26 +42,28 @@ class Sync {
 		$response    = json_decode( $response, true );
 		$offer_count = 0;
 		foreach ( $response['offers'] as $offer ) {
-			if ( $offer_count > 5 ) {
-				$last_updated = get_field( 'last_update_time', 'option' );
-				wp_send_json_success(
-					array(
-						'offer_count'     => $offer_count,
-						'last_updated_at' => $last_updated,
-					),
-					200
-				);
+			// if ( $offer_count > 5 ) {
+			// $last_updated = get_field( 'last_update_time', 'option' );
+			// wp_send_json_success(
+			// array(
+			// 'offer_count'     => $offer_count,
+			// 'last_updated_at' => $last_updated,
+			// ),
+			// 200
+			// );
 
-				wp_die();
-				return;
-			}
+			// wp_die();
+			// return;
+			// }
+
+			echo '<pre>' . var_export( $offer['region_id'], true ) . '</pre>';
 			switch ( $offer['region_id'] ) {
 				case 1:
 					$post_type     = 'sw_offers';
 					$location_type = 'sw_location';
 					$category_type = 'sw_category';
 					break;
-				case 2:
+				case 3:
 					$post_type     = 'gs_offers';
 					$location_type = 'gs_location';
 					$category_type = 'gs_category';
@@ -92,18 +96,16 @@ class Sync {
 
 			// Check if the post exists and if so delete it
 
-			$existing_post_id = post_exists( $offer['vendor_name'], '', '', $post_type, 'publish' );
+			// $existing_post_id = post_exists( $offer['vendor_name'], '', '', $post_type, 'publish' );
 
-			if ( $existing_post_id > 0 ) {
-				wp_delete_post( $existing_post_id, true );
-			}
+			// if ( $existing_post_id > 0 ) {
+			// wp_delete_post( $existing_post_id, true );
+			// }
 
 			// Check the active field and bail if it isn't there
-
 			if ( false == $offer['active'] ) {
-				return;
+				continue;
 			}
-
 			// Lets insert the post
 
 			$offer_id = wp_insert_post(
@@ -158,11 +160,11 @@ class Sync {
 		}
 		$last_updated = get_field( 'last_update_time', 'option' );
 		wp_send_json_success(
-			array(
-				'offer_count'     => $offer_count,
-				'last_updated_at' => $last_updated,
-			),
-			200
+		array(
+			'offer_count'     => $offer_count,
+			'last_updated_at' => $last_updated,
+		),
+		200
 		);
 
 		wp_die();
