@@ -37,7 +37,7 @@ class Sync {
 
 		if ( false == $all ) {
 			 $last_update = new \DateTime( get_field( 'last_update_time', 'option' ) );
-			$last_update->modify( '-1 day' );
+			$last_update->modify( '-7 day' );
 			$api_url = 'https://app.localadvantage.com.au/api/v2/offers?updates_from=' . $last_update->format( 'Y-m-d%H:i:s' );
 
 		}
@@ -66,10 +66,11 @@ class Sync {
 					$location_type = 'sw_location';
 					$category_type = 'sw_category';
 					break;
-				case Plugin::GW_REGION_ID:
+				case Plugin::GS_REGION_ID:
 					$post_type     = 'gs_offers';
 					$location_type = 'gs_location';
 					$category_type = 'gs_category';
+					break;
 			}
 
 			$offer_count++;
