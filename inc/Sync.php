@@ -37,7 +37,7 @@ class Sync {
 
 		if ( false == $all ) {
 			 $last_update = new \DateTime( get_field( 'last_update_time', 'option' ) );
-			$last_update->modify( '-7 day' );
+			$last_update->modify( '-1 day' );
 			$api_url = 'https://app.localadvantage.com.au/api/v2/offers?updates_from=' . $last_update->format( 'Y-m-d%H:i:s' );
 
 		}
@@ -165,11 +165,11 @@ class Sync {
 		}
 		$last_updated = get_field( 'last_update_time', 'option' );
 		wp_send_json_success(
-			array(
-				'offer_count'     => $offer_count,
-				'last_updated_at' => $last_updated,
-			),
-			200
+		array(
+			'offer_count'     => $offer_count,
+			'last_updated_at' => $last_updated,
+		),
+		200
 		);
 
 		wp_die();
