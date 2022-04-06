@@ -39,7 +39,7 @@ class Sync {
 		}
 
 		if ( 'holiday-advantage' == APP_SITE_NAME ) {
-			$api_url = 'eg. https://app.localadvantage.com.au/api/v2/offers?holiday_advantage=1';
+			$api_url = 'https://app.localadvantage.com.au/api/v2/offers?holiday_advantage=1';
 		}
 
 		if ( false == $all ) {
