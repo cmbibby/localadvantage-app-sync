@@ -6,6 +6,8 @@ class Sync {
 
 
 
+
+
 	public function __construct() {
 		 add_action( 'wp_ajax_nopriv_get_offers_all', array( $this, 'get_offers_all' ) );
 		add_action( 'wp_ajax_get_offers_all', array( $this, 'get_offers_all' ) );
@@ -32,15 +34,29 @@ class Sync {
 	}
 
 	public function get_offers( $all ) {
+		if ( 'local-advantage' == APP_SITE_NAME ) {
+			$api_url = 'https://app.localadvantage.com.au/api/v2/offers';
+		}
 
-		$api_url = 'https://app.localadvantage.com.au/api/v2/offers';
+		if ( 'holiday-advantage' == APP_SITE_NAME ) {
+			$api_url = 'eg. https://app.localadvantage.com.au/api/v2/offers?holiday_advantage=1';
+		}
 
 		if ( false == $all ) {
-			 $last_update = new \DateTime( get_field( 'last_update_time', 'option' ) );
+			$last_update = new \DateTime( get_field( 'last_update_time', 'option' ) );
 			$last_update->modify( '-1 day' );
-			$api_url = 'https://app.localadvantage.com.au/api/v2/offers?updates_from=' . $last_update->format( 'Y-m-d%H:i:s' );
 
-		}
+			if ( 'local-advantage' == APP_SITE_NAME ) {
+				$api_url = $api_url . '?updates_from=' . $last_update->format( 'Y-m-d%H:i:s' );
+			}
+
+			if ( 'holiday-advantage' == APP_SITE_NAME ) {
+
+				// We're appending query param
+
+				$api_url = $api_url . '&updates_from=' . $last_update->format( 'Y-m-d%H:i:s' );
+			}
+}
 
 		Utilities::update_timestamp();
 		$offers      = array();
@@ -60,17 +76,26 @@ class Sync {
 			// wp_die();
 			// return;
 			// }
-			switch ( $offer['region_id'] ) {
-				case Plugin::SW_REGION_ID:
-					$post_type     = 'sw_offers';
-					$location_type = 'sw_location';
-					$category_type = 'sw_category';
-					break;
-				case Plugin::GS_REGION_ID:
-					$post_type     = 'gs_offers';
-					$location_type = 'gs_location';
-					$category_type = 'gs_category';
-					break;
+
+			if ( 'local-advantage' == APP_SITE_NAME ) {
+				switch ( $offer['region_id'] ) {
+					case Plugin::SW_REGION_ID:
+						$post_type     = 'sw_offers';
+						$location_type = 'sw_location';
+						$category_type = 'sw_category';
+						break;
+					case Plugin::GS_REGION_ID:
+						$post_type     = 'gs_offers';
+						$location_type = 'gs_location';
+						$category_type = 'gs_category';
+						break;
+				}
+			}
+
+			if ( 'holiday-advantage' == APP_SITE_NAME ) {
+				$post_type     = 'offers';
+				$location_type = 'location';
+				$category_type = 'category';
 			}
 
 			$offer_count++;
@@ -165,11 +190,11 @@ class Sync {
 		}
 		$last_updated = get_field( 'last_update_time', 'option' );
 		wp_send_json_success(
-		array(
-			'offer_count'     => $offer_count,
-			'last_updated_at' => $last_updated,
-		),
-		200
+			array(
+				'offer_count'     => $offer_count,
+				'last_updated_at' => $last_updated,
+			),
+			200
 		);
 
 		wp_die();
