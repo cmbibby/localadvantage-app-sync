@@ -94,8 +94,8 @@ class Sync {
 
 			if ( 'holiday-advantage' == APP_SITE_NAME ) {
 				$post_type     = 'offers';
-				$location_type = 'location';
-				$category_type = 'category';
+				$location_type = 'offer_location';
+				$category_type = 'offer_category';
 			}
 
 			$offer_count++;

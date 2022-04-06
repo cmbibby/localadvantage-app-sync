@@ -16,7 +16,7 @@ class Options_Page {
 
 
 	function admin_menu() {
-		 add_management_page( 'App Sync', 'App Sync', 'install_plugins', 'la_app_sync', array( $this, 'page_content' ), '' );
+		 add_management_page( 'App Sync', 'App Sync', 'install_plugins', 'la_app_sync', array( $this, 'page_content' ) );
 	}
 
 
