@@ -64,18 +64,6 @@ class Sync
 		$response    = json_decode($response, true);
 		$offer_count = 0;
 		foreach ($response['offers'] as $offer) {
-			// if ( $offer_count > 25 ) {
-			// $last_updated = get_field( 'last_update_time', 'option' );
-			// wp_send_json_success(
-			// array(
-			// 'offer_count'     => $offer_count,
-			// 'last_updated_at' => $last_updated,
-			// ),
-			// 200
-			// );
-			// wp_die();
-			// return;
-			// }
 
 			if ('local-advantage' == APP_SITE_NAME) {
 				switch ($offer['region_id']) {
@@ -189,11 +177,16 @@ class Sync
 			}
 
 			update_field('field_59a74fe116594', $gallery_media, $offer_id);
+
+			// Update search and filter
+
+			do_action('search_filter_update_post_cache', $offer_id);
+
+			// Remove and reindex Relevanssi
+
+			relevanssi_index_doc($offer_id, true, 'all');
 		}
 		$last_updated = get_field('last_update_time', 'option');
-
-		//**
-		// TODO: Relevanssi reindex
 
 		wp_send_json_success(
 			array(
