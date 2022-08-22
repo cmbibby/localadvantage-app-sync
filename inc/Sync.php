@@ -44,7 +44,7 @@ class Sync
 
 		if (false == $all) {
 			$last_update = new \DateTime(get_field('last_update_time', 'option'));
-			$last_update->modify('-1 day');
+			$last_update->modify('-4 hours');
 
 			if ('local-advantage' == APP_SITE_NAME) {
 				$api_url = $api_url . '?updates_from=' . $last_update->format('Y-m-d%H:i:s');
