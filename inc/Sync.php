@@ -2,68 +2,68 @@
 
 namespace LA_App_Sync;
 
-class Sync {
-
-
-
-
-
-	public function __construct() {
-		 add_action( 'wp_ajax_nopriv_get_offers_all', array( $this, 'get_offers_all' ) );
-		add_action( 'wp_ajax_get_offers_all', array( $this, 'get_offers_all' ) );
-		add_action( 'wp_ajax_nopriv_get_offers_latest', array( $this, 'get_offers_latest' ) );
-		add_action( 'wp_ajax_get_offers_latest', array( $this, 'get_offers_latest' ) );
-		add_action( 'get_offers', array( $this, 'get_offers_latest' ) );
+class Sync
+{
+	public function __construct()
+	{
+		add_action('wp_ajax_nopriv_get_offers_all', array($this, 'get_offers_all'));
+		add_action('wp_ajax_get_offers_all', array($this, 'get_offers_all'));
+		add_action('wp_ajax_nopriv_get_offers_latest', array($this, 'get_offers_latest'));
+		add_action('wp_ajax_get_offers_latest', array($this, 'get_offers_latest'));
+		add_action('get_offers', array($this, 'get_offers_latest'));
 
 		// We need to bring these in to use media_sideload
 
-		require_once( ABSPATH . 'wp-admin/includes/media.php' );
-		require_once( ABSPATH . 'wp-admin/includes/file.php' );
-		require_once( ABSPATH . 'wp-admin/includes/image.php' );
-		if ( ! is_admin() ) {
-			require_once( ABSPATH . 'wp-admin/includes/post.php' );
+		require_once(ABSPATH . 'wp-admin/includes/media.php');
+		require_once(ABSPATH . 'wp-admin/includes/file.php');
+		require_once(ABSPATH . 'wp-admin/includes/image.php');
+		if (!is_admin()) {
+			require_once(ABSPATH . 'wp-admin/includes/post.php');
 		}
 	}
 
-	public function get_offers_all() {
-	  $this->get_offers( true );
+	public function get_offers_all()
+	{
+		$this->get_offers(true);
 	}
 
-	public function get_offers_latest() {
-	   $this->get_offers( false );
+	public function get_offers_latest()
+	{
+		$this->get_offers(false);
 	}
 
-	public function get_offers( $all ) {
-		if ( 'local-advantage' == APP_SITE_NAME ) {
+	public function get_offers($all)
+	{
+		if ('local-advantage' == APP_SITE_NAME) {
 			$api_url = 'https://app.localadvantage.com.au/api/v2/offers';
 		}
 
-		if ( 'holiday-advantage' == APP_SITE_NAME ) {
+		if ('holiday-advantage' == APP_SITE_NAME) {
 			$api_url = 'https://app.localadvantage.com.au/api/v2/offers?holiday_advantage=1';
 		}
 
-		if ( false == $all ) {
-			$last_update = new \DateTime( get_field( 'last_update_time', 'option' ) );
-			$last_update->modify( '-1 day' );
+		if (false == $all) {
+			$last_update = new \DateTime(get_field('last_update_time', 'option'));
+			$last_update->modify('-1 day');
 
-			if ( 'local-advantage' == APP_SITE_NAME ) {
-				$api_url = $api_url . '?updates_from=' . $last_update->format( 'Y-m-d%H:i:s' );
+			if ('local-advantage' == APP_SITE_NAME) {
+				$api_url = $api_url . '?updates_from=' . $last_update->format('Y-m-d%H:i:s');
 			}
 
-			if ( 'holiday-advantage' == APP_SITE_NAME ) {
+			if ('holiday-advantage' == APP_SITE_NAME) {
 
 				// We're appending query param
 
-				$api_url = $api_url . '&updates_from=' . $last_update->format( 'Y-m-d%H:i:s' );
+				$api_url = $api_url . '&updates_from=' . $last_update->format('Y-m-d%H:i:s');
 			}
-}
+		}
 
 		Utilities::update_timestamp();
 		$offers      = array();
-		$response    = wp_remote_retrieve_body( wp_remote_get( $api_url ) );
-		$response    = json_decode( $response, true );
+		$response    = wp_remote_retrieve_body(wp_remote_get($api_url));
+		$response    = json_decode($response, true);
 		$offer_count = 0;
-		foreach ( $response['offers'] as $offer ) {
+		foreach ($response['offers'] as $offer) {
 			// if ( $offer_count > 25 ) {
 			// $last_updated = get_field( 'last_update_time', 'option' );
 			// wp_send_json_success(
@@ -77,8 +77,8 @@ class Sync {
 			// return;
 			// }
 
-			if ( 'local-advantage' == APP_SITE_NAME ) {
-				switch ( $offer['region_id'] ) {
+			if ('local-advantage' == APP_SITE_NAME) {
+				switch ($offer['region_id']) {
 					case Plugin::SW_REGION_ID:
 						$post_type     = 'sw_offers';
 						$location_type = 'sw_location';
@@ -92,7 +92,7 @@ class Sync {
 				}
 			}
 
-			if ( 'holiday-advantage' == APP_SITE_NAME ) {
+			if ('holiday-advantage' == APP_SITE_NAME) {
 				$post_type     = 'offers';
 				$location_type = 'ha_offer_location';
 				$category_type = 'ha_offer_category';
@@ -102,10 +102,10 @@ class Sync {
 
 			// Locations
 
-			$location_term = term_exists( $offer['location_name'], $location_type );
+			$location_term = term_exists($offer['location_name'], $location_type);
 
-			if ( ! $location_term ) {
-				$location_term = wp_insert_term( $offer['location_name'], $location_type );
+			if (!$location_term) {
+				$location_term = wp_insert_term($offer['location_name'], $location_type);
 			}
 
 			// Categories
@@ -113,34 +113,34 @@ class Sync {
 			$categories = $offer['categories'];
 
 			$categories_to_add = [];
-			foreach ( $categories as $category ) {
-				$existing_category = term_exists( $category['name'], $category_type );
-				if ( $existing_category ) {
+			foreach ($categories as $category) {
+				$existing_category = term_exists($category['name'], $category_type);
+				if ($existing_category) {
 					$categories_to_add[] = $existing_category['term_taxonomy_id'];
 				} else {
-					$new_category        = wp_insert_term( $category['name'], $category_type );
+					$new_category        = wp_insert_term($category['name'], $category_type);
 					$categories_to_add[] = $new_category['term_taxonomy_id'];
 				}
 			}
 
 			// Check if the post exists and if so delete it
 
-			$existing_post_id = post_exists( $offer['vendor_name'], '', '', $post_type, 'publish' );
+			$existing_post_id = post_exists($offer['vendor_name'], '', '', $post_type, 'publish');
 
-			if ( $existing_post_id > 0 ) {
-				wp_delete_post( $existing_post_id, true );
+			if ($existing_post_id > 0) {
+				wp_delete_post($existing_post_id, true);
 			}
 
 			// Check the active field and bail if it isn't there
 
-			if ( false == $offer['active'] ) {
+			if (false == $offer['active']) {
 				continue;
 			}
 			// Lets insert the post
 
 			$offer_id = wp_insert_post(
 				array(
-					'post_name'   => sanitize_title( $offer['vendor_name'] ),
+					'post_name'   => sanitize_title($offer['vendor_name']),
 					'post_title'  => $offer['vendor_name'],
 					'post_type'   => $post_type,
 					'post_status' => 'publish',
@@ -164,31 +164,37 @@ class Sync {
 				'field_6228978384673' => 'latitude',
 				'field_6228978abb5b6' => 'longitude',
 			);
-			foreach ( $acf_fields as $key => $name ) {
-				update_field( $key, $offer[ $name ], $offer_id );
+			foreach ($acf_fields as $key => $name) {
+				update_field($key, $offer[$name], $offer_id);
 			}
 
 			// Do the Logo
 
 			$images = $offer['images'];
 
-			$logo = array_shift( $images );
+			$logo = array_shift($images);
 
-			$media_id = media_sideload_image( 'https://app.localadvantage.com.au/images/catalog/' . $logo, null, $offer['vendor_name'], 'id' );
+			// $media_id = media_sideload_image( 'https://app.localadvantage.com.au/images/catalog/' . $logo, null, $offer['vendor_name'], 'id' );
+			$media_id = media_sideload_image('https://app.localadvantage.com.au/images/offers_original/' . $logo, null, $offer['vendor_name'], 'id');
 
-			set_post_thumbnail( $offer_id, $media_id );
+			set_post_thumbnail($offer_id, $media_id);
 
 			// Do the Gallery images
 
 			$gallery_media = array();
-			foreach ( $images as $image ) {
-				$image_name      = Utilities::format_image_title( $offer['vendor_name'], $image );
-				$gallery_media[] = media_sideload_image( 'https://app.localadvantage.com.au/images/catalog/' . $image, null, $image_name, 'id' );
+			foreach ($images as $image) {
+				$image_name      = Utilities::format_image_title($offer['vendor_name'], $image);
+				// $gallery_media[] = media_sideload_image( 'https://app.localadvantage.com.au/images/catalog/' . $image, null, $image_name, 'id' );
+				$gallery_media[] = media_sideload_image('https://app.localadvantage.com.au/images/offers_original/' . $image, null, $image_name, 'id');
 			}
 
-			update_field( 'field_59a74fe116594', $gallery_media, $offer_id );
+			update_field('field_59a74fe116594', $gallery_media, $offer_id);
 		}
-		$last_updated = get_field( 'last_update_time', 'option' );
+		$last_updated = get_field('last_update_time', 'option');
+
+		//**
+		// TODO: Relevanssi reindex
+
 		wp_send_json_success(
 			array(
 				'offer_count'     => $offer_count,
