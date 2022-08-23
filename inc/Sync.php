@@ -145,7 +145,7 @@ class Sync
 				'field_59a55be66555f' => 'offer_title',
 				'field_59a55c1365560' => 'offer_description',
 				'field_621f64e9b0172' => 'offer_conditions',
-				'field_59a55c8365561' => 'vendor',
+				'field_59a55c8365561' => 'vendor_about',
 				'field_59a55deb8384e' => 'address',
 				'field_59a67fa63fbb0' => 'phone',
 				'field_59a55e0b11ceb' => 'website',
