@@ -11,6 +11,7 @@ class Sync
 		add_action('wp_ajax_nopriv_get_offers_latest', array($this, 'get_offers_latest'));
 		add_action('wp_ajax_get_offers_latest', array($this, 'get_offers_latest'));
 		add_action('get_offers', array($this, 'get_offers_latest'));
+		add_action('get_offers_all', array($this, 'get_offers_all'));
 
 		// We need to bring these in to use media_sideload
 
