@@ -35,6 +35,8 @@ class Sync
 
 	public function get_offers($all)
 	{
+		global $nginx_purger;
+
 		if ('local-advantage' == APP_SITE_NAME) {
 			$api_url = 'https://app.localadvantage.com.au/api/v2/offers';
 		}
@@ -93,9 +95,14 @@ class Sync
 
 			$location_term = term_exists($offer['location_name'], $location_type);
 
+			error_log('Location Term Exists returns : ' .  var_export($location_term, true));
+
 			if (!$location_term) {
 				$location_term = wp_insert_term($offer['location_name'], $location_type);
 			}
+
+			error_log('Location Term will be : ' . var_export($location_term, true));
+
 
 			// Categories
 
@@ -176,17 +183,21 @@ class Sync
 				// $gallery_media[] = media_sideload_image( 'https://app.localadvantage.com.au/images/catalog/' . $image, null, $image_name, 'id' );
 				$gallery_media[] = media_sideload_image('https://app.localadvantage.com.au/images/offers_original/' . $image, null, $image_name, 'id');
 			}
-
-			update_field('field_59a74fe116594', $gallery_media, $offer_id);
-
-			// Update search and filter
-
-			do_action('search_filter_update_post_cache', $offer_id);
-
-			// Remove and reindex Relevanssi
-
-			relevanssi_index_doc($offer_id, true, 'all');
 		}
+		update_field('field_59a74fe116594', $gallery_media, $offer_id);
+
+		// Update search and filter
+
+		do_action('search_filter_update_post_cache', $offer_id);
+
+		// Remove and reindex Relevanssi
+
+		relevanssi_index_doc($offer_id, true, 'all');
+
+		// Purge Nginx
+
+		$nginx_purger->purge_all();
+
 		$last_updated = get_field('last_update_time', 'option');
 
 		wp_send_json_success(
