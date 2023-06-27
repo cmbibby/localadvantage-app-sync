@@ -7,7 +7,7 @@
  * Author URI:      https://chrisbibby.com.au
  * Text Domain:     localadvantage-app-sync
  * Domain Path:     /languages
- * Version:         1.0.0
+ * Version:         1.0.1
  *
  * @package         Localadvantage_App_Sync
  */
