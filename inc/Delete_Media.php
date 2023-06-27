@@ -21,8 +21,11 @@ class Delete_Media
 		$logo_id = get_post_thumbnail_id($post);
 		wp_delete_attachment($logo_id, true);
 		$gallery_attachments = get_field('offer_gallery', $post_id);
-		foreach ($gallery_attachments as $attachment) {
-		  wp_delete_attachment( $attachment['id'], true );
+		if(is_array($gallery_attachments)){
+			foreach ($gallery_attachments as $attachment) {
+				wp_delete_attachment( $attachment['id'], true );
+			  }
 		}
+
 	}
 }

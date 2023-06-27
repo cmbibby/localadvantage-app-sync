@@ -95,13 +95,13 @@ class Sync
 
 			$location_term = term_exists($offer['location_name'], $location_type);
 
-			error_log('Location Term Exists returns : ' .  var_export($location_term, true));
+			//error_log('Location Term Exists returns : ' .  var_export($location_term, true));
 
 			if (!$location_term) {
 				$location_term = wp_insert_term($offer['location_name'], $location_type);
 			}
 
-			error_log('Location Term will be : ' . var_export($location_term, true));
+		//	error_log('Location Term will be : ' . var_export($location_term, true));
 
 
 			// Categories
