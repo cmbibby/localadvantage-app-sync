@@ -180,7 +180,6 @@ class Sync
 			$gallery_media = array();
 			foreach ($images as $image) {
 				$image_name      = Utilities::format_image_title($offer['vendor_name'], $image);
-				error_log('trying to sideload ' . $image . ' -- ' . $image_name);
 				// $gallery_media[] = media_sideload_image( 'https://app.localadvantage.com.au/images/catalog/' . $image, null, $image_name, 'id' );
 				$gallery_media[] = media_sideload_image('https://app.localadvantage.com.au/images/offers_original/' . $image, null, $image_name, 'id');
 			}
