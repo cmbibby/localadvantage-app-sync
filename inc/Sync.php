@@ -101,7 +101,7 @@ class Sync
 				$location_term = wp_insert_term($offer['location_name'], $location_type);
 			}
 
-		//	error_log('Location Term will be : ' . var_export($location_term, true));
+			//	error_log('Location Term will be : ' . var_export($location_term, true));
 
 
 			// Categories
@@ -180,11 +180,13 @@ class Sync
 			$gallery_media = array();
 			foreach ($images as $image) {
 				$image_name      = Utilities::format_image_title($offer['vendor_name'], $image);
+				error_log('trying to sideload ' . $image . ' -- ' . $image_name);
 				// $gallery_media[] = media_sideload_image( 'https://app.localadvantage.com.au/images/catalog/' . $image, null, $image_name, 'id' );
 				$gallery_media[] = media_sideload_image('https://app.localadvantage.com.au/images/offers_original/' . $image, null, $image_name, 'id');
 			}
+
+			update_field('field_59a74fe116594', $gallery_media, $offer_id);
 		}
-		update_field('field_59a74fe116594', $gallery_media, $offer_id);
 
 		// Update search and filter
 
